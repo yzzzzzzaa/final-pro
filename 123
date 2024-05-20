@@ -1,0 +1,207 @@
+import random
+
+class HungerGames:
+    def __init__(self):
+        self.health = 100
+        self.hunger = 50
+        self.thirst = 50
+        self.inventory = []
+        self.day = 1
+
+    def start_game(self):
+        print("Welcome to The Hunger Games!")
+        print("You are Katniss Everdeen, and you must survive the arena.")
+        self.prologue()
+
+    def prologue(self):
+        print("\nPrologue: The Reaping")
+        print("You stand in the town square of District 12, surrounded by your friends and family. The air is thick with tension.")
+        print("Effie Trinket announces your name, and your world changes forever. You are going to the Hunger Games.")
+        print("...")
+        print("After a harrowing train ride to the Capitol, and days of preparation, the time has come. The arena awaits.")
+        self.choice_intro()
+
+    def choice_intro(self):
+        print("\nDay 1: The Bloodbath")
+        print("The Games are about to begin. You find yourself on a metal plate, surrounded by other tributes and the Cornucopia in the distance.")
+        choice = input("Do you run to the Cornucopia (1) or run into the forest (2)? ")
+        if choice == '1':
+            self.cornucopia()
+        elif choice == '2':
+            self.forest()
+        else:
+            print("Invalid choice. Try again.")
+            self.choice_intro()
+
+    def cornucopia(self):
+        print("\nYou run to the Cornucopia, adrenaline pumping.")
+        self.health -= random.randint(10, 30)
+        print(f"You got hit in the chaos! Your health is now {self.health}.")
+        self.inventory.append('knife')
+        print("You managed to grab a knife and fled into the forest.")
+        self.forest()
+
+    def forest(self):
+        print(f"\nDay {self.day} in the Arena")
+        print(f"Health: {self.health}, Hunger: {self.hunger}, Thirst: {self.thirst}")
+        print("You are deep in the forest, the sounds of distant battles echo around you.")
+        choice = input("Do you search for food (1), find water (2), or build a shelter (3)? ")
+        if choice == '1':
+            self.search_food()
+        elif choice == '2':
+            self.find_water()
+        elif choice == '3':
+            self.build_shelter()
+        else:
+            print("Invalid choice. Try again.")
+            self.forest()
+
+    def search_food(self):
+        print("\nYou decide to search for food.")
+        food_found = random.choice([True, False])
+        if food_found:
+            self.hunger -= 20
+            print(f"You found some edible berries! Your hunger is now {self.hunger}.")
+            self.inventory.append('food')
+        else:
+            self.hunger += 10
+            print(f"You couldn't find any food. Your hunger is now {self.hunger}.")
+        self.next_move()
+
+    def find_water(self):
+        print("\nYou decide to search for water.")
+        water_found = random.choice([True, False])
+        if water_found:
+            self.thirst -= 20
+            print(f"You found a stream and drank your fill! Your thirst is now {self.thirst}.")
+            self.inventory.append('water')
+        else:
+            self.thirst += 10
+            print(f"You couldn't find any water. Your thirst is now {self.thirst}.")
+        self.next_move()
+
+    def build_shelter(self):
+        print("\nYou decide to build a shelter to rest and hide.")
+        self.health += 10
+        print(f"Your health improves as you rest in your shelter. Health: {self.health}.")
+        self.next_move()
+
+    def next_move(self):
+        if self.health <= 0:
+            self.end_game("died")
+            return
+        if self.hunger >= 100 or self.thirst >= 100:
+            self.end_game("starved/thirst")
+            return
+        print(f"\nHealth: {self.health}, Hunger: {self.hunger}, Thirst: {self.thirst}")
+        choice = input("Do you rest (1), explore further (2), or check inventory (3)? ")
+        if choice == '1':
+            self.rest()
+        elif choice == '2':
+            self.explore()
+        elif choice == '3':
+            self.check_inventory()
+        else:
+            print("Invalid choice. Try again.")
+            self.next_move()
+
+    def rest(self):
+        print("\nYou rest for a while, trying to regain your strength.")
+        self.health += 20
+        self.hunger += 10
+        self.thirst += 10
+        print(f"Health: {self.health}, Hunger: {self.hunger}, Thirst: {self.thirst}")
+        self.next_move()
+
+    def explore(self):
+        print("\nYou decide to explore further into the forest.")
+        encounter = random.choice(['enemy', 'friend', 'nothing', 'trap', 'supply'])
+        if encounter == 'enemy':
+            self.encounter_enemy()
+        elif encounter == 'friend':
+            self.encounter_friend()
+        elif encounter == 'trap':
+            self.encounter_trap()
+        elif encounter == 'supply':
+            self.find_supply()
+        else:
+            print("You find nothing of interest.")
+            self.next_move()
+
+    def encounter_enemy(self):
+        print("\nYou encounter an enemy!")
+        if 'knife' in self.inventory:
+            self.health -= 30
+            print("You fought off the enemy with your knife but got injured.")
+        else:
+            self.health -= 50
+            print("You fought off the enemy with your bare hands and got severely injured.")
+        print(f"Health: {self.health}")
+        self.next_move()
+
+    def encounter_friend(self):
+        print("\nYou encounter an ally!")
+        self.health += 20
+        self.hunger -= 20
+        self.thirst -= 20
+        print(f"Your ally shared food and water and helped heal your wounds. Health: {self.health}, Hunger: {self.hunger}, Thirst: {self.thirst}")
+        self.next_move()
+
+    def encounter_trap(self):
+        print("\nYou stepped into a trap!")
+        self.health -= 40
+        print(f"You managed to escape but got injured. Health: {self.health}")
+        self.next_move()
+
+    def find_supply(self):
+        print("\nYou find a hidden supply cache!")
+        self.inventory.append('first aid kit')
+        self.inventory.append('food')
+        self.inventory.append('water')
+        print(f"You found a first aid kit, food, and water. Inventory: {self.inventory}")
+        self.next_move()
+
+    def check_inventory(self):
+        print(f"\nYour inventory: {self.inventory}")
+        if 'food' in self.inventory:
+            use_food = input("Do you want to eat some food? (yes/no) ")
+            if use_food == 'yes':
+                self.hunger -= 20
+                self.inventory.remove('food')
+                print(f"You ate some food. Hunger: {self.hunger}")
+        if 'water' in self.inventory:
+            use_water = input("Do you want to drink some water? (yes/no) ")
+            if use_water == 'yes':
+                self.thirst -= 20
+                self.inventory.remove('water')
+                print(f"You drank some water. Thirst: {self.thirst}")
+        if 'first aid kit' in self.inventory:
+            use_kit = input("Do you want to use the first aid kit? (yes/no) ")
+            if use_kit == 'yes':
+                self.health += 30
+                self.inventory.remove('first aid kit')
+                print(f"You used the first aid kit. Health: {self.health}")
+        self.next_move()
+
+    def end_game(self, outcome):
+        if outcome == "died":
+            print("\nYou succumbed to your injuries. The Capitol watches as your cannon fires, signaling your death.")
+        elif outcome == "starved/thirst":
+            print("\nYou succumbed to starvation or dehydration. The Capitol watches as your cannon fires, signaling your death.")
+        elif outcome == "won":
+            print("\nCongratulations! You have survived the Hunger Games. The Capitol celebrates your victory, but you know the real battle has just begun.")
+        print("Game over.")
+        self.play_again()
+
+    def play_again(self):
+        choice = input("Do you want to play again? (yes/no) ")
+        if choice.lower() == 'yes':
+            self.__init__()
+            self.start_game()
+        else:
+            print("Thank you for playing!")
+
+# Start the game
+game = HungerGames()
+game.start_game()
+  
